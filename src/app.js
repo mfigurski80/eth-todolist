@@ -1,6 +1,7 @@
 const Web3 = require('web3')
 const TruffleContract = require('truffle-contract')
 
+// haha quick hack for async input stuff
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
@@ -14,19 +15,18 @@ async function prompt(s) {
 }
 
 
-App = {
+// object to handle interactions with blockchain
+const App = {
 
     contracts: {},
 
     load: async () => {
-        // load app...
         console.log('app loading...')
         App.loadWeb3()
         await App.loadAccount()
         await App.loadContracts()
     },
 
-    // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
     loadWeb3: () => {
         App.web3Provider = new Web3.providers.HttpProvider("http://localhost:8545")
         App.web3 = new Web3(App.web3Provider)
@@ -67,10 +67,12 @@ App = {
     
 }
 
+// quickie to show tasks in a pretty way
 const logTasks = tasks => tasks.forEach((t) => {
-        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
+        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : ''})`)
     })
 
+// async environment for main execution
 const main = async () => {
     await App.load()
     console.log("Account:", App.account)
@@ -78,11 +80,12 @@ const main = async () => {
     let tasks = await App.getTasks()
     logTasks(tasks)
 
+    // kinda weird cli
     const actions = {
         'add': async () => {
             return App.createTask(await prompt('New Task: '))
         },
-        't': async () => {
+        'toggle': async () => {
             return App.toggleCompleted(Number(await prompt('Task ID: ')))
         }
     }
@@ -98,8 +101,5 @@ const main = async () => {
         logTasks(tasks)
     }
 
-
-
-    debugger
 }
 main()
