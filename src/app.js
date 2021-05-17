@@ -1,5 +1,17 @@
-const Web3 = require('web3');
-const TruffleContract = require('truffle-contract');
+const Web3 = require('web3')
+const TruffleContract = require('truffle-contract')
+
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+async function prompt(s) {
+    return new Promise((resolve, reject) => {
+        readline.question(s, resp => {
+            resolve(resp)
+        })
+    })
+}
 
 
 App = {
@@ -43,7 +55,11 @@ App = {
                 isComplete: task.isComplete
             }
         }))
-    }
+    },
+
+    createTask: async (content) => {
+        return App.todoList.createTask(content, { from: App.account })
+    },
     
 }
 
@@ -51,10 +67,21 @@ const main = async () => {
     await App.load()
     console.log("Account:", App.account)
     console.log("TodoList Contract:", App.todoList.address)
-    const tasks = await App.getTasks()
+    let tasks = await App.getTasks()
     tasks.forEach((t) => {
         console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
     })
+
+    let newContent = await prompt('\nNew Task : ')
+    await App.createTask(newContent)
+
+    tasks = await App.getTasks()
+    console.log()
+    tasks.forEach((t) => {
+        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
+    })
+
+
     debugger
 }
 main()
