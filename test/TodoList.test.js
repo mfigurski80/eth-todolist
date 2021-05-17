@@ -39,4 +39,14 @@ contract('TodoList', (accounts) => {
         assert.equal(event.id.toNumber(), originalCount.toNumber(), 'Malformed ID')
         assert.equal(event.content, 'TEST TASK', 'Malformed Content')
     })
+
+    it('toggles task completion', async () => {
+        const originalCount = await this.todoList.taskCount()
+        const result = await this.todoList.toggleCompleted(0)
+        const event = result.logs[0].args
+        const newCount = await this.todoList.taskCount()
+        assert.equal(originalCount.toNumber(), newCount.toNumber(), 'Altered task count')
+        assert.equal(event.id.toNumber(), 0, 'Altered or selected incorrect id')
+        assert.equal(event.isComplete, true, 'Toggle failed')
+    })
 })

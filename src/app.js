@@ -60,26 +60,44 @@ App = {
     createTask: async (content) => {
         return App.todoList.createTask(content, { from: App.account })
     },
+
+    toggleCompleted: async (id) => {
+        return App.todoList.toggleCompleted(id, { from: App.account })
+    }
     
 }
+
+const logTasks = tasks => tasks.forEach((t) => {
+        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
+    })
 
 const main = async () => {
     await App.load()
     console.log("Account:", App.account)
     console.log("TodoList Contract:", App.todoList.address)
     let tasks = await App.getTasks()
-    tasks.forEach((t) => {
-        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
-    })
+    logTasks(tasks)
 
-    let newContent = await prompt('\nNew Task : ')
-    await App.createTask(newContent)
+    const actions = {
+        'add': async () => {
+            return App.createTask(await prompt('New Task: '))
+        },
+        't': async () => {
+            return App.toggleCompleted(Number(await prompt('Task ID: ')))
+        }
+    }
 
-    tasks = await App.getTasks()
-    console.log()
-    tasks.forEach((t) => {
-        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
-    })
+    while (true) {
+        console.log('')
+        console.log(Object.keys(actions))
+        let choice = await prompt('Action ? ')
+        await actions[choice]()
+
+        tasks = await App.getTasks()
+        console.log()
+        logTasks(tasks)
+    }
+
 
 
     debugger
