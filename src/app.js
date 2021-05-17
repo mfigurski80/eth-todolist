@@ -47,16 +47,14 @@ App = {
     
 }
 
-
-App.load()
-    .then(() => {
-        console.log("Account:", App.account)
-        console.log("TodoList Contract:", App.todoList.address)
-        return App.getTasks();
+const main = async () => {
+    await App.load()
+    console.log("Account:", App.account)
+    console.log("TodoList Contract:", App.todoList.address)
+    const tasks = await App.getTasks()
+    tasks.forEach((t) => {
+        console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
     })
-    .then((tasks) => {
-        tasks.forEach((t) => {
-            console.log(`[${t.id}] ${t.content} (${t.isComplete ? 'Done' : 'Pending...'})`)
-        })
-        debugger
-    })
+    debugger
+}
+main()
